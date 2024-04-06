@@ -10,6 +10,7 @@ import {
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { PublicRoute } from 'src/public-route/public-route.decorator';
 
 @Controller('album')
 export class AlbumController {
@@ -20,6 +21,7 @@ export class AlbumController {
     return this.albumService.create(createAlbumDto);
   }
 
+  @PublicRoute()
   @Get()
   findAll() {
     return this.albumService.findAll();
@@ -30,6 +32,7 @@ export class AlbumController {
     return this.albumService.findOne(+id);
   }
 
+  @PublicRoute()
   @Get('by-artist/:artistId')
   findByArtistId(@Param('artistId') artistId: string) {
     return this.albumService.findByArtist(+artistId);

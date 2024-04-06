@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import { PublicRoute } from 'src/public-route/public-route.decorator';
 
 @Controller('artists')
 export class ArtistsController {
@@ -12,6 +21,7 @@ export class ArtistsController {
     return this.artistsService.create(createArtistDto);
   }
 
+  @PublicRoute()
   @Get()
   findAll() {
     return this.artistsService.findAll();

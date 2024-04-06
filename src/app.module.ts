@@ -9,6 +9,7 @@ import { AlbumModule } from './album/album.module';
 import { Album } from './album/entities/album.entity';
 import { Song } from './song/entities/song.entity';
 import { ArtistsModule } from './artists/artists.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ArtistsModule } from './artists/artists.module';
     SongModule,
     AlbumModule,
     ArtistsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
