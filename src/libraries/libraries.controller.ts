@@ -30,7 +30,7 @@ export class LibrariesController {
 
   @Post()
   create(@Body() createLibraryDto: CreateLibraryDto, @Req() req: Request) {
-    return this.librariesService.create(createLibraryDto, req['user'].id);
+    return this.librariesService.create(createLibraryDto, req['user'].sub);
   }
 
   @HttpCode(204)
