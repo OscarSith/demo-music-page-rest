@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Library } from 'src/libraries/entities/library.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -16,4 +17,7 @@ export class User {
 
   @Column('varchar', { length: 100, select: false })
   password: string;
+
+  @OneToMany(() => Library, (library) => library.user)
+  libraries: Library[];
 }

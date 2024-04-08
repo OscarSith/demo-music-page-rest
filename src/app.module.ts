@@ -10,6 +10,11 @@ import { Album } from './album/entities/album.entity';
 import { Song } from './song/entities/song.entity';
 import { ArtistsModule } from './artists/artists.module';
 import { AuthModule } from './auth/auth.module';
+import { LibrariesModule } from './libraries/libraries.module';
+import { LibrariesDataModule } from './libraries-data/libraries-data.module';
+import { Library } from './libraries/entities/library.entity';
+import { LibraryData } from './libraries-data/entities/library-data.entity';
+import { Artist } from './artists/entities/artist.entity';
 
 @Module({
   imports: [
@@ -20,7 +25,7 @@ import { AuthModule } from './auth/auth.module';
       username: 'root',
       password: 'root',
       database: 'pruebamusica',
-      entities: [User, Song, Album],
+      entities: [User, Song, Album, Library, LibraryData, Artist],
       synchronize: true,
       autoLoadEntities: true,
     }),
@@ -29,6 +34,8 @@ import { AuthModule } from './auth/auth.module';
     AlbumModule,
     ArtistsModule,
     AuthModule,
+    LibrariesModule,
+    LibrariesDataModule,
   ],
   controllers: [AppController],
   providers: [AppService],

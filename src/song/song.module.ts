@@ -9,5 +9,6 @@ import { AlbumModule } from 'src/album/album.module';
   imports: [TypeOrmModule.forFeature([Song]), AlbumModule],
   controllers: [SongController],
   providers: [SongService],
+  exports: [SongService],
 })
 export class SongModule {}
