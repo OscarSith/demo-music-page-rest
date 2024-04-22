@@ -6,19 +6,46 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipeBuilder,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { PublicRoute } from 'src/public-route/public-route.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Controller('artists')
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
   @Post()
-  create(@Body() createArtistDto: CreateArtistDto) {
-    return this.artistsService.create(createArtistDto);
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: diskStorage({
+        destination: './public/avatar',
+        filename(req, file, callback) {
+          const newFileName =
+            Date.now() + '-' + Math.round(Math.random() * 1e9) + '_';
+          callback(null, newFileName + file.originalname);
+        },
+      }),
+    }),
+  )
+  create(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: 'image/jpeg',
+        })
+        .build(),
+    )
+    avatar: Express.Multer.File,
+    @Body() createArtistDto: CreateArtistDto,
+  ) {
+    return this.artistsService.create(createArtistDto, avatar.path);
   }
 
   @PublicRoute()

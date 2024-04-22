@@ -12,7 +12,8 @@ export class ArtistsService {
     private artistRepository: Repository<Artist>,
   ) {}
 
-  create(createArtistDto: CreateArtistDto) {
+  create(createArtistDto: CreateArtistDto, fileUrl: string) {
+    createArtistDto.avatar = fileUrl;
     return this.artistRepository.save(createArtistDto);
   }
 
