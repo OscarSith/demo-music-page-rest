@@ -45,7 +45,7 @@ export class ArtistsController {
     avatar: Express.Multer.File,
     @Body() createArtistDto: CreateArtistDto,
   ) {
-    return this.artistsService.create(createArtistDto, avatar.path);
+    return this.artistsService.create(createArtistDto, avatar.filename);
   }
 
   @PublicRoute()

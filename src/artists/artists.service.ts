@@ -12,8 +12,8 @@ export class ArtistsService {
     private artistRepository: Repository<Artist>,
   ) {}
 
-  create(createArtistDto: CreateArtistDto, fileUrl: string) {
-    createArtistDto.avatar = fileUrl;
+  create(createArtistDto: CreateArtistDto, filename: string) {
+    createArtistDto.avatar = 'assets/avatar/' + filename;
     return this.artistRepository.save(createArtistDto);
   }
 
@@ -33,6 +33,6 @@ export class ArtistsService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} artist`;
+    return this.artistRepository.delete({ id });
   }
 }
