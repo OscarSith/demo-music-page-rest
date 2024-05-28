@@ -3,12 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseInterceptors,
   UploadedFile,
   ParseFilePipeBuilder,
+  Put,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -16,6 +16,8 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { PublicRoute } from 'src/public-route/public-route.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+
+const MIME_TYPES = 'jpeg|jpg|png';
 
 @Controller('artists')
 export class ArtistsController {
@@ -38,7 +40,7 @@ export class ArtistsController {
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType: 'image/jpeg',
+          fileType: new RegExp(MIME_TYPES),
         })
         .build(),
     )
@@ -59,9 +61,33 @@ export class ArtistsController {
     return this.artistsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
-    return this.artistsService.update(+id, updateArtistDto);
+  @Put(':id')
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: diskStorage({
+        destination: './public/avatar',
+        filename(req, file, callback) {
+          const newFileName =
+            Date.now() + '-' + Math.round(Math.random() * 1e9) + '_';
+          callback(null, newFileName + file.originalname);
+        },
+      }),
+    }),
+  )
+  update(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: new RegExp(MIME_TYPES),
+        })
+        .build({ fileIsRequired: false }),
+    )
+    avatar: Express.Multer.File,
+    @Param('id')
+    id: string,
+    @Body() updateArtistDto: UpdateArtistDto,
+  ) {
+    return this.artistsService.update(+id, updateArtistDto, avatar?.filename);
   }
 
   @Delete(':id')
