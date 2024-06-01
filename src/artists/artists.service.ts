@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Artist } from './entities/artist.entity';
 import { Repository } from 'typeorm';
 import { unlink } from 'fs/promises';
+import { changeUrlImagePath } from 'src/utils/sharedFunctions';
 
 @Injectable()
 export class ArtistsService {
@@ -44,7 +45,7 @@ export class ArtistsService {
     if (avatar) {
       updateArtistDto.avatar = this.PATH_ASSSETS + avatar;
       try {
-        await unlink(this.changeUrlImagePath(artist.avatar));
+        await unlink(changeUrlImagePath(artist.avatar));
       } catch (error) {
         console.log(error);
         throw new HttpException(
@@ -62,7 +63,7 @@ export class ArtistsService {
     const artist = await this.findOne(id);
     if (artist) {
       try {
-        await unlink(this.changeUrlImagePath(artist.avatar));
+        await unlink(changeUrlImagePath(artist.avatar));
       } catch (error) {
         throw new HttpException(
           'Ocurrió un error al intentar eliminar el archivo',
@@ -73,15 +74,5 @@ export class ArtistsService {
     }
 
     throw new HttpException('No se pudo borrar el artista', 404);
-  }
-
-  /**
-   * Cambia la ruta /assets/avatar/......jpg por /public/avatar/....jpg
-   * la ruta original en el sistema está en public/avatar
-   * @param urlPath ruta de la imagen
-   * @returns string nueva ruta de la imagen
-   */
-  private changeUrlImagePath(urlPath: string): string {
-    return urlPath.replace('assets', 'public');
   }
 }
