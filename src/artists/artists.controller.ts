@@ -9,6 +9,8 @@ import {
   UploadedFile,
   ParseFilePipeBuilder,
   Put,
+  Query,
+  HttpException,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -48,6 +50,15 @@ export class ArtistsController {
     @Body() createArtistDto: CreateArtistDto,
   ) {
     return this.artistsService.create(createArtistDto, avatar.filename);
+  }
+
+  @Get('/search-by')
+  searchByName(@Query('name') name: string) {
+    if (name) {
+      return this.artistsService.searchByName(name);
+    }
+
+    throw new HttpException('A name param must be send', 401);
   }
 
   @PublicRoute()

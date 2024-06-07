@@ -1,9 +1,13 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from './entities/album.entity';
-import { Repository } from 'typeorm';
+import { DataSource, QueryFailedError, Repository } from 'typeorm';
 import { ArtistsService } from 'src/artists/artists.service';
 import { unlink } from 'fs/promises';
 import { changeUrlImagePath } from 'src/utils/sharedFunctions';
@@ -16,6 +20,7 @@ export class AlbumService {
     @InjectRepository(Album)
     private albumRepository: Repository<Album>,
     private readonly artistsService: ArtistsService,
+    private dataSource: DataSource,
   ) {}
 
   async create(createAlbumDto: CreateAlbumDto, picture: string) {
@@ -25,7 +30,14 @@ export class AlbumService {
     newAlbum.artist = artist;
     newAlbum.picture = this.PATH_ASSSETS + picture;
 
-    return await this.albumRepository.save(newAlbum);
+    const data = await this.albumRepository.save(newAlbum);
+
+    return {
+      id: data.id,
+      name: data.name,
+      picture: data.picture,
+      created_at: data.artist.created_at,
+    } as Album;
   }
 
   async findAll() {
@@ -65,7 +77,38 @@ export class AlbumService {
     return this.albumRepository.save(albumUpdated);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} album`;
+  async remove(id: number) {
+    const album = await this.findOne(id);
+
+    if (album) {
+      const queryRunner = this.dataSource.createQueryRunner();
+
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      const response = await this.albumRepository
+        .delete({ id })
+        .catch((error: QueryFailedError) => {
+          console.log(error);
+          throw new InternalServerErrorException();
+        });
+
+      try {
+        await unlink(changeUrlImagePath(album.picture));
+        console.log('Imagen del album eliminado');
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+
+        throw new HttpException(
+          'Ocurrió un error al intentar eliminar la imagen del album',
+          500,
+        );
+      }
+
+      await queryRunner.release();
+      return response;
+    }
+
+    throw new HttpException('No se pudo borrar el album', 404);
   }
 }

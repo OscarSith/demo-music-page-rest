@@ -25,6 +25,10 @@ export class Artist {
   })
   created_at: Date;
 
+  // It is only for search name and lastname
+  @Column('varchar', { length: 200, nullable: true, select: false })
+  fullname: string;
+
   @OneToMany(() => Album, (album) => album.artist)
   albums: Album[];
 }
