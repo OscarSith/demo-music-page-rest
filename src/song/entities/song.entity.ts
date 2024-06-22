@@ -22,7 +22,7 @@ export class Song {
   @Column('int')
   duration: number;
 
-  @Column('varchar', { length: 8 })
+  @Column('varchar', { length: 8, default: 0 })
   playcount: string;
 
   @ManyToOne(() => Album, (album) => album.songs)

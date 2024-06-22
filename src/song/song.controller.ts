@@ -6,23 +6,52 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipeBuilder,
 } from '@nestjs/common';
 import { SongService } from './song.service';
 import { CreateSongDto } from './dto/create-song.dto';
 import { UpdateSongDto } from './dto/update-song.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Controller('song')
 export class SongController {
   constructor(private readonly songService: SongService) {}
 
   @Post()
-  create(@Body() createSongDto: CreateSongDto) {
-    return this.songService.create(createSongDto);
+  @UseInterceptors(
+    FileInterceptor('song', {
+      storage: diskStorage({
+        destination: './public/songs',
+        filename(req, file, callback) {
+          callback(null, file.originalname);
+        },
+      }),
+    }),
+  )
+  create(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({ fileType: 'audio/mpeg' })
+        .build(),
+    )
+    song: Express.Multer.File,
+    @Body()
+    createSongDto: CreateSongDto,
+  ) {
+    return this.songService.create(createSongDto, song);
   }
 
-  @Get()
-  findAll() {
-    return this.songService.findAll();
+  @Get(':albumId/albums')
+  findAll(@Param('albumId') albumId: string) {
+    return new Promise((resolve) => {
+      setTimeout(
+        () => resolve(this.songService.findAllByAlbum(+albumId)),
+        1000,
+      );
+    });
   }
 
   @Get(':id')
