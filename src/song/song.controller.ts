@@ -3,12 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseInterceptors,
   UploadedFile,
   ParseFilePipeBuilder,
+  Put,
 } from '@nestjs/common';
 import { SongService } from './song.service';
 import { CreateSongDto } from './dto/create-song.dto';
@@ -41,7 +41,11 @@ export class SongController {
     @Body()
     createSongDto: CreateSongDto,
   ) {
-    return this.songService.create(createSongDto, song);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(this.songService.create(createSongDto, song));
+      }, 1000);
+    });
   }
 
   @Get(':albumId/albums')
@@ -59,7 +63,7 @@ export class SongController {
     return this.songService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateSongDto: UpdateSongDto) {
     return this.songService.update(+id, updateSongDto);
   }

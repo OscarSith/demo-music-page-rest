@@ -42,8 +42,8 @@ export class SongService {
     return this.songRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateSongDto: UpdateSongDto) {
-    const song = this.findOne(id);
+  async update(id: number, updateSongDto: UpdateSongDto) {
+    const song = await this.findOne(id);
     const newData = Object.assign(song, updateSongDto);
 
     return this.songRepository.save(newData);
