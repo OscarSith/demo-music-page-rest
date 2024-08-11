@@ -24,7 +24,11 @@ export class UsersController {
 
   @Get()
   findAll() {
-    return this.usersService.findAll();
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(this.usersService.findAll());
+      }, 1700);
+    });
   }
 
   @Get(':id')

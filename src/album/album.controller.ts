@@ -63,7 +63,11 @@ export class AlbumController {
   @PublicRoute()
   @Get('by-artist/:artistId')
   findByArtistId(@Param('artistId') artistId: string) {
-    return this.albumService.findByArtist(+artistId);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(this.albumService.findByArtist(+artistId));
+      }, 500);
+    });
   }
 
   @Put(':id')

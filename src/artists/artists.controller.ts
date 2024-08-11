@@ -64,7 +64,11 @@ export class ArtistsController {
   @PublicRoute()
   @Get()
   findAll() {
-    return this.artistsService.findAll();
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(this.artistsService.findAll());
+      }, 700);
+    });
   }
 
   @Get(':id')
@@ -98,7 +102,13 @@ export class ArtistsController {
     id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ) {
-    return this.artistsService.update(+id, updateArtistDto, avatar?.filename);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(
+          this.artistsService.update(+id, updateArtistDto, avatar?.filename),
+        );
+      }, 1500);
+    });
   }
 
   @Delete(':id')
